@@ -1,0 +1,6 @@
+.vercel/
+dist/
+index.html
+index-light.html
+.env*
+node_modules/

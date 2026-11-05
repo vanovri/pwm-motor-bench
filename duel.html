@@ -1,0 +1,107 @@
+<section id="duel-view" class="duel-view" aria-labelledby="duel-title" hidden>
+  <header class="duel-intro">
+    <div><p class="eyebrow"><span>04</span> UJI BEBAN SERENTAK</p><h1 id="duel-title">Duel <span>Dyno.</span></h1>
+    <p class="lede">Dua motor, satu gangguan. Mana yang lebih dekat ke 1.800 RPM?</p></div>
+    <div class="duel-clock"><span>WAKTU UJI</span><strong id="duel-time">00,0</strong><span> / 10 dtk</span></div>
+  </header>
+
+  <div class="duel-lanes">
+    <article class="duel-lane fixed-lane" data-lane="fixed">
+      <div class="lane-head"><span>01 / LOOP TERBUKA</span><span class="lane-chip">DUTY TETAP</span></div>
+      <div class="lane-body">%%DUELMOTOR%%
+        <div class="lane-readout"><span>PUTARAN MOTOR</span><div><strong data-lane-rpm>1.800</strong> <small>RPM</small></div>
+        <p>Duty <b data-lane-duty>50%</b></p></div>
+      </div>
+    </article>
+    <article class="duel-lane hold-lane" data-lane="hold">
+      <div class="lane-head"><span>02 / LOOP TERTUTUP</span><span class="lane-chip">TAHAN RPM</span></div>
+      <div class="lane-body">%%DUELMOTOR%%
+        <div class="lane-readout"><span>PUTARAN MOTOR</span><div><strong data-lane-rpm>1.800</strong> <small>RPM</small></div>
+        <p>Duty <b data-lane-duty>50%</b></p></div>
+      </div>
+    </article>
+  </div>
+
+  <details id="pit-panel" class="pit-panel">
+    <summary><span><b>PIT TUNING</b><span>Setel kontrol PI</span></span><span id="pit-profile-name">PI bawaan</span></summary>
+    <div class="pit-content">
+      <fieldset id="pit-config">
+        <legend class="visually-hidden">Setelan kontrol PI</legend>
+        <div class="pit-presets" role="group" aria-label="Profil tuning PI">
+          <button type="button" data-pi-profile="default" aria-pressed="true">Bawaan</button>
+          <button type="button" data-pi-profile="smooth" aria-pressed="false">Redam lonjakan</button>
+          <button type="button" data-pi-profile="quick" aria-pressed="false">Pulih cepat</button>
+        </div>
+        <div class="pit-sliders">
+          <div><label for="pit-kp">Gain P</label><output id="pit-kp-value" for="pit-kp">0,035</output>
+            <input id="pit-kp" type="range" min="0.010" max="0.110" step="0.005" value="0.035"></div>
+          <div><label for="pit-ki">Gain I</label><output id="pit-ki-value" for="pit-ki">0,095</output>
+            <input id="pit-ki" type="range" min="0.050" max="0.155" step="0.005" value="0.095"></div>
+        </div>
+      </fieldset>
+      <div class="pit-metrics">
+        <table>
+          <caption id="pit-caption">Simulasi beban 65%</caption>
+          <thead><tr><th scope="col">Metrik</th><th scope="col">PI bawaan</th><th scope="col">Setelan aktif</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Galat rata-rata</th><td id="pit-base-mae"></td><td id="pit-tune-mae"></td></tr>
+            <tr><th scope="row">Lonjakan di atas target</th><td id="pit-base-peak"></td><td id="pit-tune-peak"></td></tr>
+            <tr><th scope="row">Pulih ke ±2%</th><td id="pit-base-settle"></td><td id="pit-tune-settle"></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </details>
+
+  <div class="duel-console">
+    <section class="duel-telemetry" aria-labelledby="duel-telemetry-title">
+      <div class="duel-panel-head"><h2 id="duel-telemetry-title">Telemetri balapan</h2><span id="duel-phase">SIAP</span></div>
+      <div class="duel-chart">
+        <svg viewBox="0 0 610 196" role="img" aria-label="Grafik RPM dua motor selama sepuluh detik. Zona beban dari detik dua sampai enam.">
+          <g transform="translate(45 10)">
+            <rect x="110" y="0" width="220" height="155" class="duel-zone"/>
+            <path class="duel-grid" d="M0 0H550M0 31H550M0 62H550M0 93H550M0 124H550M0 155H550M0 0V155M110 0V155M220 0V155M330 0V155M440 0V155M550 0V155"/>
+            <path class="duel-reference" d="M0 74.4H550"/>
+            <path id="duel-baseline-line" class="duel-trace" hidden/>
+            <path id="duel-fixed-line" class="duel-trace"/>
+            <path id="duel-hold-line" class="duel-trace"/>
+            <path id="duel-cursor" d="M0 0V155"/>
+            <circle id="duel-fixed-dot" cx="0" cy="74.4" r="3.5"/>
+            <circle id="duel-hold-dot" cx="0" cy="74.4" r="3.5"/>
+            <text x="-7" y="4" text-anchor="end">3.000</text><text x="-7" y="35" text-anchor="end">2.500</text>
+            <text x="-7" y="66" text-anchor="end">2.000</text><text x="-7" y="97" text-anchor="end">1.500</text>
+            <text x="-7" y="128" text-anchor="end">1.000</text><text x="-7" y="158" text-anchor="end">500</text>
+            <text x="0" y="176">0</text><text x="110" y="176" text-anchor="middle">2</text>
+            <text x="220" y="176" text-anchor="middle">4</text><text x="330" y="176" text-anchor="middle">6</text>
+            <text x="440" y="176" text-anchor="middle">8</text><text x="550" y="176" text-anchor="end">10 dtk</text>
+          </g>
+        </svg>
+      </div>
+      <div class="duel-chart-legend">
+        <span><i></i> Duty tetap</span><span><i></i> Tahan RPM</span><span><i></i> Target</span><span><i></i> Zona beban</span><span id="duel-baseline-legend" hidden><i></i> PI bawaan</span>
+      </div>
+    </section>
+    <section class="duel-brief" aria-label="Atur balapan">
+      <div class="duel-panel-head"><h2>Gangguan beban</h2><span id="duel-load">0%</span></div>
+      <div class="duel-load-choices" role="group" aria-label="Besar gangguan beban">
+        <button type="button" data-duel-load="65" aria-pressed="true">65%</button>
+        <button type="button" data-duel-load="100" aria-pressed="false">100%</button>
+      </div>
+      <ol class="duel-phases">
+        <li data-stage="0"><span>00–02 dtk</span><strong>Stabil</strong></li>
+        <li data-stage="1"><span>02–06 dtk</span><strong>Beban masuk</strong></li>
+        <li data-stage="2"><span>06–10 dtk</span><strong>Beban lepas</strong></li>
+      </ol>
+      <div class="duel-actions"><button id="duel-run" type="button">Mulai duel</button><button id="duel-reset" type="button" disabled>Reset</button></div>
+    </section>
+  </div>
+
+  <section id="duel-result" class="duel-result" aria-labelledby="duel-result-title" hidden>
+    <div><span class="micro">HASIL UJI</span><h2 id="duel-result-title"></h2><p id="duel-result-copy"></p><button id="duel-export" type="button">Ekspor CSV</button></div>
+    <dl class="duel-scores">
+      <div><dt>GALAT RATA-RATA · DUTY TETAP</dt><dd><span id="duel-score-fixed"></span> <small>RPM</small></dd></div>
+      <div><dt>GALAT RATA-RATA · TAHAN RPM</dt><dd><span id="duel-score-hold"></span> <small>RPM</small></dd></div>
+    </dl>
+  </section>
+  <p id="duel-announcement" class="visually-hidden" aria-live="polite"></p>
+</section>

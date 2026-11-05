@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Meja uji motor DC interaktif. Ubah PWM dan beban sambil mengamati kipas, osiloskop, dan RPM.">
+  <title>PWM Motor Bench · Signal Bench</title>
+  <style>%%STYLES%%</style>
+</head>
+<body class="iso" data-theme="%%THEME%%">
+  <header class="topbar">
+    <div class="shell masthead">
+      <div class="brand">
+        <svg width="35" height="35" viewBox="0 0 35 35" aria-hidden="true">
+          <rect width="35" height="35" rx="7" fill="currentColor"/>
+          <path d="M8 22h5v-9h9v9h5" fill="none" stroke="var(--base)" stroke-width="2" stroke-linejoin="round"/>
+        </svg>
+        <span>Signal Bench</span>
+      </div>
+      <div class="mast-end">
+        <span class="edition">LAB 05 <b>/</b> SISTEM EMBEDDED</span>
+        <button id="duel-toggle" type="button" aria-pressed="false" aria-controls="duel-view"><span aria-hidden="true">▰</span> Duel Dyno</button>
+        <button id="theme" type="button" aria-label="Tema terang" aria-pressed="false">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <div id="bench-page">
+    <div class="intro">
+      <div>
+        <p class="eyebrow"><span>03</span> MEJA UJI MOTOR DC</p>
+        <h1>PWM <span>Motor Bench.</span></h1>
+        <p class="lede">Bongkar motor untuk lihat bagian dalamnya. Ubah beban untuk menguji kontrol kecepatannya.</p>
+      </div>
+      <div class="specs" aria-label="Spesifikasi simulasi">
+        <div><span>FREKUENSI PWM</span><strong>1 kHz</strong></div>
+        <div><span>TEGANGAN HIGH</span><strong>12 V</strong></div>
+      </div>
+    </div>
+
+    <div class="workspace" id="experiment">
+      <figure class="instrument">
+        <div class="iso-plate">
+          <div class="figure-head">
+            <span><b>FIG. 03</b><span class="head-divider"></span><span id="figure-title">RIG MOTOR DC</span></span>
+            <div class="figure-actions">
+              <button id="teardown-toggle" type="button" aria-pressed="false" aria-controls="teardown-view">
+                <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M10 2 3 6l7 4 7-4-7-4ZM3 10l7 4 7-4M3 14l7 4 7-4"/></svg>
+                Bongkar motor
+              </button>
+              <button id="motion" type="button" aria-label="Jeda animasi" aria-pressed="false"><i aria-hidden="true"></i><span>Jeda animasi</span></button>
+            </div>
+          </div>
+          <div id="bench-view" class="scene">%%FIGURE%%</div>
+          <div id="teardown-view" class="scene-detail" hidden>
+            <div class="teardown-scene">%%TEARDOWN%%</div>
+            <div class="part-inspector">
+              <div class="part-options" role="group" aria-label="Pilih komponen motor">
+                <button type="button" data-inspect="stator" aria-pressed="true"><b>01</b> Stator</button>
+                <button type="button" data-inspect="armature" aria-pressed="false"><b>02</b> Rotor</button>
+                <button type="button" data-inspect="fan" aria-pressed="false"><b>03</b> Kipas</button>
+              </div>
+              <p id="part-copy" aria-live="polite"><strong>Stator.</strong> Magnet diam membentuk medan tempat rotor berputar.</p>
+            </div>
+          </div>
+          <div class="figure-foot">
+            <span><b aria-hidden="true">↔</b> <span id="figure-hint">Geser fader pada ilustrasi</span></span>
+            <span id="figure-readout" data-readout>62% DUTY</span>
+          </div>
+        </div>
+        <figcaption class="legend">
+          <span class="key"><i></i> Sinyal PWM</span>
+          <span class="key rotor-key"><i></i> Rotor · gerak 1/18×</span>
+          <span id="machine-state" data-active="true">Motor aktif</span>
+        </figcaption>
+      </figure>
+
+      <section class="controls" aria-labelledby="control-title">
+        <div class="panel-head"><h2 id="control-title">Panel kendali</h2><button id="hold" type="button" aria-pressed="false" aria-controls="hold-config"><i aria-hidden="true"></i>Tahan RPM</button></div>
+        <div id="hold-config" class="hold-config" hidden>
+          <div class="knob-head"><label for="setpoint">Setpoint</label><output id="setpoint-value" for="setpoint">1.800 RPM</output></div>
+          <input type="range" id="setpoint" min="600" max="2800" step="50" value="1800" style="--position:54.55%">
+        </div>
+        <div class="knob">
+          <div class="knob-head"><label for="duty">Duty cycle</label><output id="duty-value" for="duty">62%</output></div>
+          <input type="range" id="duty" value="62" min="0" max="100" step="1" style="--position:62%">
+        </div>
+        <div class="knob load">
+          <div class="knob-head"><label for="load">Beban rotasi</label><output id="load-value" for="load">20%</output></div>
+          <input type="range" id="load" value="20" min="0" max="100" step="1" style="--position:20%">
+        </div>
+        <div id="manual-presets" class="presets" role="group" aria-label="Skenario uji">
+          <button type="button" data-duty="35" data-load="0" aria-pressed="false">Ringan</button>
+          <button type="button" data-duty="85" data-load="0" aria-pressed="false">Akselerasi</button>
+          <button type="button" data-duty="85" data-load="85" aria-pressed="false">Beban tinggi</button>
+        </div>
+        <div id="hold-presets" class="presets" role="group" aria-label="Ubah beban motor" hidden>
+          <button type="button" data-load-step="0" aria-pressed="false">Beban 0%</button>
+          <button type="button" data-load-step="65" aria-pressed="false">Beban 65%</button>
+          <button type="button" data-load-step="100" aria-pressed="false">Beban 100%</button>
+        </div>
+        <div class="plot-box">
+          <div class="plot-head"><span><i></i> OSILOSKOP</span><span>2 ms</span></div>
+          <svg id="plot" viewBox="0 0 252 83" role="img" aria-label="Sinyal PWM dengan duty cycle 62 persen">
+            <g transform="translate(27 0)">
+              <path class="plot-grid" d="M0 12H220M0 35.5H220M0 59H220M0 12V59M55 12V59M110 12V59M165 12V59M220 12V59"/>
+              <path id="plot-trace" class="signal" d="%%TRACE%%"/>
+              <text x="-5" y="15" text-anchor="end">12 V</text>
+              <text x="-5" y="62" text-anchor="end">0 V</text>
+              <text x="0" y="76">0</text>
+              <text x="110" y="76" text-anchor="middle">1 ms</text>
+              <text x="220" y="76" text-anchor="end">2 ms</text>
+            </g>
+          </svg>
+        </div>
+        <dl class="electrical">
+          <div><dt>WAKTU HIGH</dt><dd><span id="high-time">620</span> <small>µs</small></dd></div>
+          <div><dt>TEGANGAN RATA-RATA</dt><dd><span id="avg-voltage">7,44</span> <small>V</small></dd></div>
+        </dl>
+      </section>
+    </div>
+
+    <div class="instruments">
+      <section class="speed" aria-label="Tachometer">
+        <div class="speed-reading"><span class="micro">RPM SIMULASI</span><p><strong id="rpm">1.744</strong> <span>RPM</span></p></div>
+        <div class="speed-chart">
+          <div class="chart-meta"><span>RIWAYAT RPM</span><span>5 dtk</span></div>
+          <svg viewBox="0 0 220 41" role="img" aria-label="Grafik riwayat RPM, lima detik terakhir.">
+            <path d="M0 4H220M0 21H220M0 38H220M44 4V38M88 4V38M132 4V38M176 4V38" class="speed-grid"/>
+            <path id="speed-setpoint" hidden/>
+            <path id="speed-history"/>
+          </svg>
+        </div>
+        <div class="speed-end"><span class="micro" id="target-label">RPM STABIL</span><p id="target">1.744</p><button id="coast" type="button">Putus PWM</button></div>
+      </section>
+      <aside class="notes" aria-label="Cara uji">
+        <span class="micro">COBA INI</span>
+        <p id="experiment-tip">Nyalakan <strong>Tahan RPM</strong>, lalu klik <strong>Beban 65%</strong>. Lihat duty naik untuk mengejar setpoint.</p>
+      </aside>
+    </div>
+    </div>
+    %%DUEL%%
+  </main>
+
+  <footer class="shell footer">
+    <span>MODEL MOTOR DC ORDE SATU · PARAMETER ILUSTRASI</span>
+    <span><a href="https://github.com/vanovri/pwm-motor-bench">Source</a> <b>·</b> <a href="https://github.com/wheresryan22/anatomy">Anatomy</a> <b>·</b> <a href="https://introcontrol.mit.edu/fall21/prelabs/prelab10/model">Model PWM</a> <b>·</b> <a href="https://vlabs.iitkgp.ac.in/ctrl/Exp3/theory.html">Model orde satu</a></span>
+  </footer>
+  <!-- Anatomy SVG kit license
+%%LICENSE%%
+  -->
+  <script>%%SCRIPT%%</script>
+</body>
+</html>
